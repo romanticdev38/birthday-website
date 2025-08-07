@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday My Love 💖</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+  <!-- Font Awesome -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0f0f1e;
+      overflow: hidden;
+    }
+    h1, h2 {
+      font-family: 'Dancing Script', cursive;
+    }
+    .page {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100vh;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      background: linear-gradient(to bottom, #1a1a2e, #0f0f1e);
+    }
+    .active {
+      display: flex;
+    }
+    .heart {
+      position: absolute;
+      color: #ff69b4;
+      font-size: 1.5rem;
+      z-index: 0;
+    }
+  </style>
+</head>
+
+<body class="text-white">
+
+  <!-- Floating Hearts -->
+  <div id="hearts"></div>
+
+  <!-- Pages -->
+  <div id="page1" class="page active z-10">
+    <h1 class="text-5xl md:text-6xl text-pink-400 mb-6 animate-pulse">🎉 Happy Birthday, KumKum </h1>
+    <p class="text-xl text-gray-300">Let’s go on a little journey of memories & emotions 💌</p>
+    <button onclick="nextPage()" class="mt-10 px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition">Next</button>
+  </div>
+
+  <div id="page2" class="page z-10">
+    <h2 class="text-4xl text-pink-300 mb-6">A Letter From My Heart</h2>
+    <p id="loveMessage" class="text-lg text-gray-200 max-w-xl leading-loose"></p>
+    <button onclick="nextPage()" class="mt-10 px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition">Next</button>
+  </div>
+
+  <div id="page3" class="page z-10">
+    <h2 class="text-4xl text-pink-300 mb-8">Our Memories 📸</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <img src="one.jpg" class="rounded-xl shadow-lg border-2 border-pink-400" />
+      <img src="three.jpg" class="rounded-xl shadow-lg border-2 border-pink-400" />
+      <img src="two.jpg" class="rounded-xl shadow-lg border-2 border-pink-400" />
+    </div>
+    <button onclick="nextPage()" class="px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition absolute bottom-8">Next</button>
+
+  </div>
+
+  <div id="page4" class="page z-10">
+    <h2 class="text-5xl text-yellow-400 mb-6">🎁 Surprise!</h2>
+    <p class="text-xl text-white max-w-xl">You are my forever, my today, my every tomorrow. 💍<br>Happy Birthday, and I promise to love you more every single day.</p>
+    <canvas id="confetti-canvas" class="absolute inset-0 z-0 pointer-events-none"></canvas>
+  </div>
+
+  <!-- Music -->
+  <audio autoplay loop>
+    <source src="https://cdn.pixabay.com/download/audio/2023/03/01/audio_e7cf729f33.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Scripts -->
+  <script>
+    let currentPage = 1;
+    function nextPage() {
+      const current = document.getElementById("page" + currentPage);
+      const next = document.getElementById("page" + (currentPage + 1));
+      if (next) {
+        gsap.to(current, {opacity: 0, duration: 1, onComplete: () => {
+          current.classList.remove("active");
+          next.classList.add("active");
+          gsap.fromTo(next, {opacity: 0}, {opacity: 1, duration: 1});
+          currentPage++;
+          if (currentPage === 4) launchConfetti();
+        }});
+      }
+    }
+
+    // Floating hearts
+    const heartsContainer = document.getElementById("hearts");
+    function createHeart() {
+      const heart = document.createElement("div");
+      heart.className = "heart";
+      heart.style.left = Math.random() * 100 + "vw";
+      heart.innerHTML = "<i class='fas fa-heart'></i>";
+      heartsContainer.appendChild(heart);
+      gsap.to(heart, {
+        y: -window.innerHeight,
+        x: (Math.random() - 0.5) * 100,
+        rotation: Math.random() * 360,
+        opacity: 0,
+        duration: 6,
+        ease: "sine.out",
+        onComplete: () => heart.remove()
+      });
+    }
+    setInterval(createHeart, 300);
+
+    // Typewriter text effect
+    const message = `You came into my life like a beautiful melody.\nYour smile brightens even my darkest days.\nYou’re not just my love — you are my home.\nOn your special day, I just want to say:\nThank you for being mine.\nHappy Birthday, jaan. ❤️`;
+    const messageBox = document.getElementById("loveMessage");
+    let i = 0;
+    function typeWriter() {
+      if (i < message.length) {
+        messageBox.innerHTML += message.charAt(i) === '\n' ? "<br/>" : message.charAt(i);
+        i++;
+        setTimeout(typeWriter, 50);
+      }
+    }
+    setTimeout(typeWriter, 1500); // starts after page loads
+
+    // Confetti
+    function launchConfetti() {
+      const duration = 4 * 1000;
+      const end = Date.now() + duration;
+      const canvas = document.getElementById("confetti-canvas");
+      const confetti = confettiModule(canvas);
+      (function frame() {
+        confetti();
+        if (Date.now() < end) requestAnimationFrame(frame);
+      })();
+    }
+
+    // Mini confetti module
+    function confettiModule(canvas) {
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const particles = [];
+
+      function createParticle() {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: 0,
+          color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+          size: Math.random() * 8 + 2,
+          speedY: Math.random() * 3 + 2,
+          speedX: (Math.random() - 0.5) * 2
+        });
+      }
+
+      return function drawConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        createParticle();
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+          p.y += p.speedY;
+          p.x += p.speedX;
+          if (p.y > canvas.height) particles.splice(i, 1);
+        }
+      };
+    }
+  </script>
+</body>
+</html>
